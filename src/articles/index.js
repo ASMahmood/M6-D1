@@ -35,4 +35,36 @@ articleRouter.get("/:id", async (req, res) => {
   }
 });
 
+articleRouter.put("/:id", async (req, res) => {
+  try {
+    const article = await ArticleSchema.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { runValidators: true, new: true }
+    );
+    if (article) {
+      res.send(article);
+    } else {
+      res.status(404).send("ARTICLE NOT FOUND");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
+articleRouter.delete("/:id", async (req, res) => {
+  try {
+    const article = await ArticleSchema.findByIdAndDelete(req.params.id);
+    if (article) {
+      res.send("ARTICLE DELETED");
+    } else {
+      res.status(404).send("ARTICLE NOT FOUND");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
 module.exports = articleRouter;
