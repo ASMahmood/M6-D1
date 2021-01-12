@@ -25,4 +25,14 @@ articleRouter.get("/", async (req, res) => {
   }
 });
 
+articleRouter.get("/:id", async (req, res) => {
+  try {
+    const article = await ArticleSchema.findById(req.params.id);
+    res.send(article);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
 module.exports = articleRouter;
