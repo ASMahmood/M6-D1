@@ -101,8 +101,19 @@ articleRouter.get("/:id/reviews/:reviewID", async (req, res) => {
   try {
     const selectedReview = await ArticleSchema.findOne(
       { _id: mongoose.Types.ObjectId(req.params.id) },
-      { reviews: { $elem } }
+      {
+        reviews: {
+          $elemMatch: { _id: mongoose.Types.ObjectId(req.params.reviewID) },
+        },
+      }
     );
+    if (selectedReview) {
+      res.status(200).send(selectedReview.reviews[0]);
+    } else {
+      res
+        .status(404)
+        .send(`We couldn't find a review with the id ${req.params.reviewID}`);
+    }
   } catch (error) {
     console.log(error);
   }
