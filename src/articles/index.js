@@ -119,4 +119,40 @@ articleRouter.get("/:id/reviews/:reviewID", async (req, res) => {
   }
 });
 
+articleRouter.put("/:id/reviews/:reviewID", async (req, res) => {
+  try {
+    const selectedReview = await ArticleSchema.findOne(
+      { _id: mongoose.Types.ObjectId(req.params.id) },
+      {
+        reviews: {
+          $elemMatch: { _id: mongoose.Types.ObjectId(req.params.reviewID) },
+        },
+      }
+    );
+    if (selectedReview) {
+      const newReview = { ...selectedReview.reviews[0], ...req.body };
+      const alteredReview = await ArticleSchema.findOneAndUpdate(
+        {
+          _id: mongoose.Types.ObjectId(req.params.id),
+          "reviews._id": mongoose.Types.ObjectId(req.params.reviewID),
+        },
+        {
+          $set: { "reviews.$": newReview },
+        },
+        {
+          runValidators: true,
+          new: true,
+        }
+      );
+      res.status(200).send(alteredReview);
+    } else {
+      res
+        .status(404)
+        .send(`We couldn't find a review with the id ${req.params.reviewID}`);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 module.exports = articleRouter;
