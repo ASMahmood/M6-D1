@@ -1,5 +1,7 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const ArticleSchema = require("./schema");
+const ReviewSchema = require("../reviews/schema");
 
 const articleRouter = express.Router();
 
@@ -64,6 +66,45 @@ articleRouter.delete("/:id", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send(error);
+  }
+});
+
+articleRouter.post("/:id", async (req, res) => {
+  try {
+    const newReview = new ReviewSchema(req.body);
+    const review = await newReview.save();
+    const article = await ArticleSchema.findByIdAndUpdate(
+      req.params.id,
+      {
+        $push: {
+          reviews: review,
+        },
+      },
+      { runValidators: true, new: true }
+    );
+    res.status(201).send(article);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+articleRouter.get("/:id/reviews", async (req, res) => {
+  try {
+    const reviews = await ArticleSchema.findById(req.params.id, { reviews: 1 });
+    res.status(200).send(reviews.reviews);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+articleRouter.get("/:id/reviews/:reviewID", async (req, res) => {
+  try {
+    const selectedReview = await ArticleSchema.findOne(
+      { _id: mongoose.Types.ObjectId(req.params.id) },
+      { reviews: { $elem } }
+    );
+  } catch (error) {
+    console.log(error);
   }
 });
 
