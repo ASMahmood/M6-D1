@@ -155,4 +155,21 @@ articleRouter.put("/:id/reviews/:reviewID", async (req, res) => {
   }
 });
 
+articleRouter.delete("/:id/reviews/:reviewID", async (req, res) => {
+  try {
+    const alteredReview = await ArticleSchema.findByIdAndUpdate(
+      req.params.id,
+      {
+        $pull: {
+          reviews: { _id: mongoose.Types.ObjectId(req.params.reviewID) },
+        },
+      },
+      { runValidators: true, new: true }
+    );
+    res.send(alteredReview);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 module.exports = articleRouter;
