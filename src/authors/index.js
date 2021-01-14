@@ -5,8 +5,17 @@ const authorRouter = express.Router();
 
 authorRouter.get("/", async (req, res) => {
   try {
-    const allAuthors = await AuthorSchema.find();
-    res.status(200).send(allAuthors);
+    if (req.query.name) {
+      const author = await AuthorSchema.findOne({ name: req.query.name });
+      if (author) {
+        res.status(200).send(author);
+      } else {
+        res.status(404).send("no author with that name");
+      }
+    } else {
+      const allAuthors = await AuthorSchema.find();
+      res.status(200).send(allAuthors);
+    }
   } catch (error) {
     console.log(error);
     res.send("Something went wrong");
