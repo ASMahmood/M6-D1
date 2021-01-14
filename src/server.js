@@ -3,6 +3,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 const articleRoute = require("./articles");
+const authorRoute = require("./authors");
 
 const server = express();
 const port = process.env.PORT;
@@ -10,6 +11,7 @@ const port = process.env.PORT;
 server.use(cors());
 server.use(express.json());
 server.use("/articles", articleRoute);
+server.use("/authors", authorRoute);
 
 mongoose
   .connect(process.env.MONGO_ATLAS, {

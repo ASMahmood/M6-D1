@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const ArticleSchema = require("./schema");
 const ReviewSchema = require("../reviews/schema");
+const AuthorSchema = require("../authors/schema");
 
 const articleRouter = express.Router();
 
@@ -17,9 +18,19 @@ articleRouter.post("/", async (req, res) => {
   }
 });
 
+articleRouter.post("/:id/add-to-author/:authorID", async (req, res) => {
+  try {
+    await AuthorSchema.addArticleIdToAuthor(req.params.id, req.params.authorID);
+    res.send("added");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
+
 articleRouter.get("/", async (req, res) => {
   try {
-    const allArticles = await ArticleSchema.find();
+    const allArticles = await ArticleSchema.find().populate("author");
     res.send(allArticles);
   } catch (error) {
     console.log(error);
@@ -29,7 +40,9 @@ articleRouter.get("/", async (req, res) => {
 
 articleRouter.get("/:id", async (req, res) => {
   try {
-    const article = await ArticleSchema.findById(req.params.id);
+    const article = await ArticleSchema.findById(req.params.id).populate(
+      "author"
+    );
     res.send(article);
   } catch (error) {
     console.log(error);

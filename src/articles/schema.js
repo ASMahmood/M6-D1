@@ -15,14 +15,13 @@ const ArticleSchema = new Schema(
       name: String,
       img: String,
     },
-    author: {
-      name: String,
-      img: String,
-    },
+    author: { type: Schema.Types.ObjectId, ref: "Author" },
     reviews: Array,
     cover: String,
   },
   { timestamps: true }
 );
 
-module.exports = model("Articles", ArticleSchema);
+const ArticleModel = model("Articles", ArticleSchema);
+
+module.exports = ArticleModel;
